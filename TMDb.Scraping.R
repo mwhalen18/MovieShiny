@@ -2,7 +2,7 @@
 #Sorry, its not the tidiest script, but it works
 library(TMDb)
 library(tidyverse)
-api.key <- "92c579313c7b587ac61fe782545950ae"
+api.key <- "TMDb_API_KEY"
 library(parallel)
 library(lubridate)
 library(lme4)
@@ -1854,7 +1854,7 @@ TMDb6000 <- TMDb6000 %>% rename(ProdCompany.1 = production_companies.name1,
          actor.1 = ifelse(is.na(actor.1), "NULL", actor.1),
          actor.2 = ifelse(is.na(actor.2), "NULL", actor.2),
          actor.3 = ifelse(is.na(actor.3), "NULL", actor.3)) %>%
-  mutate(Earnings = as.numeric(revenue),
+  mutate(revenue = as.integer(revenue),
          Director = as.factor(Director),
          actor.1 = as.factor(actor.1),
          actor2 = as.factor(actor.2),
@@ -1867,20 +1867,6 @@ TMDb6000 <- TMDb6000 %>% rename(ProdCompany.1 = production_companies.name1,
                                                   genre.1 != "Documentary") %>%
   select(revenue, vote_average, genre.1, genre.2, genre.3, Director, actor.1, actor.2, actor.3)
 
-moneymodel <- 
-  lmer(revenue ~ 1 + genre.1 + genre.2 + genre.3 +
-         (1|Director) + (1|actor.1) + (1|actor.2) + (1|actor.3), 
-       data = TMDb6000, na.action = na.omit)
-
-newdata <- data.frame(genre.1 = "Action",
-                      genre.2 = "Adventure",
-                      genre.3 = "Science Fiction",
-                      Director = "Christopher Nolan",
-                      actor.1 = "Chris Pratt",
-                      actor.2 = "Brad Pitt",
-                      actor.3 = "Mark Ruffalo")
-
-predict(moneymodel, newdata)
 
 setwd("~/Box Sync/R Codes/MovieShiny")
 write.csv(TMDb6000, "TMDb.6000.csv") #In Todd voice from Bojack: "Hooray!"
