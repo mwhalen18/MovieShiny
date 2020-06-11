@@ -2,7 +2,7 @@
 #Sorry, its not the tidiest script, but it works
 library(TMDb)
 library(tidyverse)
-api.key <- "92c579313c7b587ac61fe782545950ae"
+api.key <- "TMDb_API_KEY"
 library(parallel)
 library(lubridate)
 library(lme4)
@@ -1705,7 +1705,7 @@ write.csv(flwa30, "full.movie.scrape.data.csv")
 
 ##########Read in full scraped data set##############################
 
-
+setwd("~/Box Sync/Data Sets")
 move <- read.csv("full.movie.scrape.data.csv")
 
 
@@ -1838,23 +1838,24 @@ movies.scraped.and.bound <- move %>% select("budget",
 
 
 
-TMDb6000 <- movies.scraped.and.bound
-
+TMDb6001 <- movies.scraped.and.bound
+View(TMDb6001)
 
 #I want to clean this more to make it fit with the other format
-TMDb6000 <- TMDb6000 %>% rename(ProdCompany.1 = production_companies.name1,
+TMDb6000 <- TMDb6001 %>% rename(ProdCompany.1 = production_companies.name1,
                                 actor.1 = actor1,
                                 actor.2 = actor2,
                                 actor.3 = actor3,
                                 actor.4 = actor4,
                                 actor.5 = actor5) %>%
-  mutate(genre.1 = ifelse(is.na(genre.1), "NULL", genre.1),
+  mutate(logrevenue = log(revenue + 1),
+         genre.1 = ifelse(is.na(genre.1), "NULL", genre.1),
          genre.2 = ifelse(is.na(genre.2), "NULL", genre.2),
          genre.3 = ifelse(is.na(genre.3), "NULL", genre.3),
          actor.1 = ifelse(is.na(actor.1), "NULL", actor.1),
          actor.2 = ifelse(is.na(actor.2), "NULL", actor.2),
          actor.3 = ifelse(is.na(actor.3), "NULL", actor.3)) %>%
-  mutate(Earnings = as.numeric(revenue),
+  mutate(revenue = as.integer(revenue),
          Director = as.factor(Director),
          actor.1 = as.factor(actor.1),
          actor2 = as.factor(actor.2),
@@ -1864,23 +1865,11 @@ TMDb6000 <- TMDb6000 %>% rename(ProdCompany.1 = production_companies.name1,
          genre.3 = as.factor(genre.3)) %>% filter(genre.1 != "TV Movie",
                                                   genre.1 != "TV Movie",
                                                   genre.3 != "TV Movie",
-                                                  genre.1 != "Documentary") %>%
-  select(revenue, vote_average, genre.1, genre.2, genre.3, Director, actor.1, actor.2, actor.3)
+                                                  genre.1 != "Documentary",
+                                                  runtime > 70,
+                                                  !is.na(logrevenue)) %>%
+  select(revenue, logrevenue, vote_average, genre.1, genre.2, genre.3, Director, actor.1, actor.2, actor.3) %>% group_by(Director) %>% mutate(count = n()) %>% filter(count > 2) %>% ungroup() %>% select(-count)
 
-moneymodel <- 
-  lmer(revenue ~ 1 + genre.1 + genre.2 + genre.3 +
-         (1|Director) + (1|actor.1) + (1|actor.2) + (1|actor.3), 
-       data = TMDb6000, na.action = na.omit)
-
-newdata <- data.frame(genre.1 = "Action",
-                      genre.2 = "Adventure",
-                      genre.3 = "Science Fiction",
-                      Director = "Christopher Nolan",
-                      actor.1 = "Chris Pratt",
-                      actor.2 = "Brad Pitt",
-                      actor.3 = "Mark Ruffalo")
-
-predict(moneymodel, newdata)
 
 setwd("~/Box Sync/R Codes/MovieShiny")
 write.csv(TMDb6000, "TMDb.6000.csv") #In Todd voice from Bojack: "Hooray!"
