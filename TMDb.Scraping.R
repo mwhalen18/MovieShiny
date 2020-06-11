@@ -1865,7 +1865,7 @@ TMDb6000 <- TMDb6000 %>% rename(ProdCompany.1 = production_companies.name1,
                                                   genre.1 != "TV Movie",
                                                   genre.3 != "TV Movie",
                                                   genre.1 != "Documentary") %>%
-  select(revenue, genre.1, genre.2, genre.3, Director, actor.1, actor.2, actor.3)
+  select(revenue, vote_average, genre.1, genre.2, genre.3, Director, actor.1, actor.2, actor.3)
 
 moneymodel <- 
   lmer(revenue ~ 1 + genre.1 + genre.2 + genre.3 +
