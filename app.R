@@ -29,7 +29,7 @@ ui <- fluidPage(titlePanel("Let's Make a Movie!"),
                            mainPanel(
                              strong("The Data"), br(),
                              "Data were collected by scraping data from various wikipedia pages. Some data was supplemented by scraping from Box Office Mojo", br(), 
-                             "A new data set is being generated using APIs from the TMDb database. Check back for updates", br(), br(), "Code is available on the my GitHub page (https://github.com/mwhalen18/movie.project)", br(), br(),
+                             "A new data set is being generated using APIs from the TMDb database. Check back for updates", br(), br(), "Code is available on the my GitHub page (https://github.com/mwhalen18/MovieShiny)", br(), br(),
                              strong("The Model"), br(),
                              "Using a novel maching learning algorithm, this app takes user input and determines a 'least squares fit' for each user input. Every time you use this app you increase the computational accuracy of the model and improve the model predictions.", br(), br(),
                              "The base model fits a linear regression on each movie genre to calculate how interactions between different genres preditct movie success. For example, the genres 'action' and 'thriller' may work well together, gaining a movie higher box office success than the genres 'action' and 'romance' might", br(),
