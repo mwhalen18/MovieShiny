@@ -50,8 +50,12 @@ ui <- fluidPage(titlePanel("Let's Make a Movie!"),
                                                                          "History", "Horror", "Music", "Mystery", "Romance", "Science Fiction", "Thriller", "War", "Western")),
                                     selectInput("genre.3", "Genre 3:", c("NULL", "Action", "Adventure", "Animation", "Comedy", "Crime", "Drama", "Family", "Fantasy",
                                                                          "History", "Horror", "Music", "Mystery", "Romance", "Science Fiction", "Thriller", "War", "Western")),
+<<<<<<< HEAD
                                     submitButton("SUBMIT"), br(),
                                     "Note: it will take a while to run"
+=======
+                                    submitButton("SUBMIT")
+>>>>>>> 795f249c4ba0f11359a0e60fd455a38a5a9f24c1
                                     ),
                            ),
                              tabsetPanel(
