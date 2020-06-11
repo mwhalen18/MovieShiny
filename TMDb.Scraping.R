@@ -1705,6 +1705,7 @@ write.csv(flwa30, "full.movie.scrape.data.csv")
 
 ##########Read in full scraped data set##############################
 
+
 move <- read.csv("full.movie.scrape.data.csv")
 
 
@@ -1860,7 +1861,11 @@ TMDb6000 <- TMDb6000 %>% rename(ProdCompany.1 = production_companies.name1,
          actor.3 = as.factor(actor.3),
          genre.1 = as.factor(genre.1),
          genre.2 = as.factor(genre.2),
-         genre.3 = as.factor(genre.3))
+         genre.3 = as.factor(genre.3)) %>% filter(genre.1 != "TV Movie",
+                                                  genre.1 != "TV Movie",
+                                                  genre.3 != "TV Movie",
+                                                  genre.1 != "Documentary") %>%
+  select(revenue, genre.1, genre.2, genre.3, Director, actor.1, actor.2, actor.3)
 
 moneymodel <- 
   lmer(revenue ~ 1 + genre.1 + genre.2 + genre.3 +
