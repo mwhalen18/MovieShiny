@@ -4,20 +4,16 @@ library(shiny)
 library(tidyverse)
 library(lme4)
 #str(bcl)
-bcl <- read.csv("final.movie.data.csv")
+TMDb6000 <- read.csv("TMDb.6000.csv")
 moneymodel <- 
-  lmer(log(Earnings) ~ 1 + Action + Adventure + Animation + Comedy + Crime + Drama +
-         Family + Fantasy + History + Horror + Music + Mystery + Romance + Science.Fiction +
-         Thriller + War + Western +
+  lmer(revenue ~ 1 + genre.1 + genre.2 + genre.3 +
          (1|Director) + (1|actor.1) + (1|actor.2) + (1|actor.3), 
-       data = bcl)
+       data = TMDb6000, na.action = na.omit)
 
 ratingsmodel <-
-  lmer(vote_average ~ 1 + Action + Adventure + Animation + Comedy + Crime + Drama +
-         Family + Fantasy + History + Horror + Music + Mystery + Romance + Science.Fiction +
-         Thriller + War + Western +
+  lmer(vote_average ~ 1 + genre.1 + genre.2 + genre.3 +
          (1|Director) + (1|actor.1) + (1|actor.2) + (1|actor.3), 
-       data = bcl)
+       data = TMDb6000, na.action = na.omit)
 
 ui <- fluidPage(titlePanel("Let's Make a Movie!"),
                 tabsetPanel(
@@ -31,15 +27,14 @@ ui <- fluidPage(titlePanel("Let's Make a Movie!"),
                              "Data were collected by scraping data from various wikipedia pages. Some data was supplemented by scraping from Box Office Mojo", br(), 
                              "A new data set is being generated using APIs from the TMDb database. Check back for updates", br(), br(), "Code is available on the my GitHub page (https://github.com/mwhalen18/MovieShiny)", br(), br(),
                              strong("The Model"), br(),
-                             "Using a novel maching learning algorithm, this app takes user input and determines a 'least squares fit' for each user input. Every time you use this app you increase the computational accuracy of the model and improve the model predictions.", br(), br(),
-                             "The base model fits a linear regression on each movie genre to calculate how interactions between different genres preditct movie success. For example, the genres 'action' and 'thriller' may work well together, gaining a movie higher box office success than the genres 'action' and 'romance' might", br(),
-                             "Using statistical methods developed for behavioral ecology, I have fit a random regression for each genre interaction with each director and lead actor combination.",
+                             "Model Desicriptions coming. Check back for updates.",
                              strong("HOW TO USE THE APP"), br(),
                              "In order for your entries to work in the model, it is important that you spell the names correctly and with correct capitalization.", br(),
                              "For example, entering Leonardo Dicaprio will not work; you must enter it as 'Leonardo DiCaprio'.", br(), 
                              "In addition, many names require special characters. For example, 'Chloe Grace Moretz' will not work; you must enter 'Chloë Grace Moretz'.", br(),
                              "You will find a list of the names of all actors and directors as they appear in the data set.", br(), br(),
-                             "Select a '1' for each genre you wish to assign to your movie. Be sure to enter a '0' for any genres you do not wish to include. (This is a weird thing that I could easily fix but I don't feel like it)"
+                             "Select a '1' for each genre you wish to assign to your movie. Be sure to enter a '0' for any genres you do not wish to include. (This is a weird thing that I could easily fix but I don't feel like it)", br(),
+                             "Update: this has been fixed. There is now a drop down menu to select your genres. Trade-off: you only get 3 genres. You still need to specify 'Null' if you wish to exclude a genres. Again, an update will fix this later.", br()
                            )),
                   tabPanel("Make Your Movie", fluid = TRUE,
                            sidebarPanel(textInput("Director", "Director Name", value = ""),
@@ -48,35 +43,15 @@ ui <- fluidPage(titlePanel("Let's Make a Movie!"),
                                           textInput("actor.3", "Supporting Actor 2", value = ""), br(), br(), br()
                                           ),
                            fluidRow(
-                             column(1,
-                                    checkboxGroupInput("Action", "Action", c("1", "0")), 
-                                    checkboxGroupInput("Adventure", "Adventure", c("1", "0")),
-                                    checkboxGroupInput("Animation", "Animation", c("1", "0")),
-                                    checkboxGroupInput("Comedy", "Comedy", c("1", "0"))
-                                    ),
-                             column(1,
-                                    checkboxGroupInput("Crime", "Crime", c("1", "0")),
-                                    checkboxGroupInput("Drama", "Drama", c("1", "0")),
-                                    checkboxGroupInput("Family", "Family", c("1", "0")),
-                                    checkboxGroupInput("Fantasy", "Fantasy", c("1", "0"))
-                             ),
-                             column(1,
-                                    checkboxGroupInput("History", "History", c("1", "0")),
-                                    checkboxGroupInput("Horror", "Horror", c("1", "0")),
-                                    checkboxGroupInput("Music", "Music", c("1", "0")),
-                                    checkboxGroupInput("Mystery", "Mystery", c("1", "0"))
-                             ),
-                             column(1,
-                                    checkboxGroupInput("Romance", "Romance", c("1", "0")),
-                                    checkboxGroupInput("Thriller", "Thirller", c("1", "0")),
-                                    checkboxGroupInput("Western", "Western", c("1", "0")),
-                                    checkboxGroupInput("War", "War", c("1", "0"))
-                             ),
-                             column(2,
-                                    checkboxGroupInput("Science.Fiction", "Science Fiction", c("1", "0")),
-                                    numericInput("year", "Release Year", 2012, min = 1916, max = 2020),
+                             column(3,
+                                    selectInput("genre.1", "Genre 1:", c("NULL", "Action", "Adventure", "Animation", "Comedy", "Crime", "Drama", "Family", "Fantasy",
+                                                                         "History", "Horror", "Music", "Mystery", "Romance", "Science Fiction", "Thriller", "War", "Western")),
+                                    selectInput("genre.2", "Genre 2:", c("NULL", "Action", "Adventure", "Animation", "Comedy", "Crime", "Drama", "Family", "Fantasy",
+                                                                         "History", "Horror", "Music", "Mystery", "Romance", "Science Fiction", "Thriller", "War", "Western")),
+                                    selectInput("genre.3", "Genre 3:", c("NULL", "Action", "Adventure", "Animation", "Comedy", "Crime", "Drama", "Family", "Fantasy",
+                                                                         "History", "Horror", "Music", "Mystery", "Romance", "Science Fiction", "Thriller", "War", "Western")),
                                     submitButton("SUBMIT")
-                           )
+                                    ),
                            ),
                              tabsetPanel(
                                tabPanel("Summary",
@@ -110,24 +85,9 @@ server <- function(input, output) {
     actor.1 = as.factor(input$actor.1),
     actor.2 = as.factor(input$actor.2),
     actor.3 = as.factor(input$actor.3),
-    Action = as.integer(input$Action),
-    Adventure = as.integer(input$Adventure),
-    Animation = as.integer(input$Animation),
-    Comedy = as.integer(input$Comedy),
-    Crime = as.integer(input$Crime),
-    Drama = as.integer(input$Drama),
-    Family = as.integer(input$Family),
-    Fantasy = as.integer(input$Fantasy),
-    History = as.integer(input$History),
-    Horror = as.integer(input$Horror),
-    Music = as.integer(input$Music),
-    Mystery = as.integer(input$Mystery),
-    Romance = as.integer(input$Romance),
-    Science.Fiction = as.integer(input$Science.Fiction),
-    Thriller = as.integer(input$Thriller),
-    War = as.integer(input$War),
-    Western = as.integer(input$Western),
-    year = as.integer(input$year)
+    genre.1 = as.factor(input$genre.1),
+    genre.2 = as.factor(input$genre.2),
+    genre.3 = as.factor(input$genre.3)
     )
   })
   output$user.data <- renderTable({
@@ -135,7 +95,7 @@ server <- function(input, output) {
   })
 
     output$moneyprediction <- renderText(
-      exp(predict(moneymodel,newdata(),allow.new.levels = FALSE))
+      predict(moneymodel,newdata(),allow.new.levels = FALSE)
   )
   
   output$ratingprediction <- renderText(
@@ -143,13 +103,13 @@ server <- function(input, output) {
   )
  
    output$directorlist <- renderTable(
-     bcl %>% select(Director) %>% unique() %>% arrange(Director)
+     TMDb6000 %>% select(Director) %>% unique() %>% arrange(Director)
      )
    output$actor1list <- renderTable(
-     bcl %>% select(actor.1) %>% unique() %>% arrange(actor.1)
+     TMDb6000 %>% select(actor.1) %>% unique() %>% arrange(actor.1)
    )
    output$suppactorlist <- renderTable(
-     bcl %>% select(actor.2) %>% unique() %>% arrange(actor.2)
+     TMDb6000 %>% select(actor.2) %>% unique() %>% arrange(actor.2)
    )
 }
   
