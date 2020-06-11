@@ -5,6 +5,7 @@ library(tidyverse)
 api.key <- "92c579313c7b587ac61fe782545950ae"
 library(parallel)
 library(lubridate)
+library(lme4)
 detectCores()
 
 ####################fetching movie data from APIS #########
@@ -1696,16 +1697,15 @@ rm(flwa28)
 flwa30 <- flwa[1:194]
 flwa30 <- bind_rows(flwa30, flwa29)
 rm(flwa29)
-################################################
-
-
-
-
-
+###########Export CSV#####################################
 write.csv(flwa30, "full.movie.scrape.data.csv")
 
-move <- read.csv("full.movie.scrape.data.csv")
 
+
+
+##########Read in full scraped data set##############################
+
+move <- read.csv("full.movie.scrape.data.csv")
 
 
 ################ DATA CLEANING ##########
@@ -1839,7 +1839,45 @@ movies.scraped.and.bound <- move %>% select("budget",
 
 TMDb6000 <- movies.scraped.and.bound
 
-setwd("~/Box Sync/Data Sets")
+
+#I want to clean this more to make it fit with the other format
+TMDb6000 <- TMDb6000 %>% rename(ProdCompany.1 = production_companies.name1,
+                                actor.1 = actor1,
+                                actor.2 = actor2,
+                                actor.3 = actor3,
+                                actor.4 = actor4,
+                                actor.5 = actor5) %>%
+  mutate(genre.1 = ifelse(is.na(genre.1), "NULL", genre.1),
+         genre.2 = ifelse(is.na(genre.2), "NULL", genre.2),
+         genre.3 = ifelse(is.na(genre.3), "NULL", genre.3),
+         actor.1 = ifelse(is.na(actor.1), "NULL", actor.1),
+         actor.2 = ifelse(is.na(actor.2), "NULL", actor.2),
+         actor.3 = ifelse(is.na(actor.3), "NULL", actor.3)) %>%
+  mutate(Earnings = as.numeric(revenue),
+         Director = as.factor(Director),
+         actor.1 = as.factor(actor.1),
+         actor2 = as.factor(actor.2),
+         actor.3 = as.factor(actor.3),
+         genre.1 = as.factor(genre.1),
+         genre.2 = as.factor(genre.2),
+         genre.3 = as.factor(genre.3))
+
+moneymodel <- 
+  lmer(revenue ~ 1 + genre.1 + genre.2 + genre.3 +
+         (1|Director) + (1|actor.1) + (1|actor.2) + (1|actor.3), 
+       data = TMDb6000, na.action = na.omit)
+
+newdata <- data.frame(genre.1 = "Action",
+                      genre.2 = "Adventure",
+                      genre.3 = "Science Fiction",
+                      Director = "Christopher Nolan",
+                      actor.1 = "Chris Pratt",
+                      actor.2 = "Brad Pitt",
+                      actor.3 = "Mark Ruffalo")
+
+predict(moneymodel, newdata)
+
+setwd("~/Box Sync/R Codes/MovieShiny")
 write.csv(TMDb6000, "TMDb.6000.csv") #In Todd voice from Bojack: "Hooray!"
 
 
