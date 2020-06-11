@@ -3,6 +3,7 @@
 library(shiny)
 library(tidyverse)
 library(lme4)
+library(shinycssloaders)
 #str(bcl)
 TMDb6000 <- read.csv("TMDb.6000.csv")
 moneymodel <- 
@@ -27,7 +28,7 @@ ui <- fluidPage(titlePanel("Let's Make a Movie!"),
                              "Data were collected by scraping data from various wikipedia pages. Some data was supplemented by scraping from Box Office Mojo", br(), 
                              "A new data set is being generated using APIs from the TMDb database. Check back for updates", br(), br(), "Code is available on the my GitHub page (https://github.com/mwhalen18/MovieShiny)", br(), br(),
                              strong("The Model"), br(),
-                             "Model Desicriptions coming. Check back for updates.",
+                             "Model Desicriptions coming. Check back for updates.", br(), br(),
                              strong("HOW TO USE THE APP"), br(),
                              "In order for your entries to work in the model, it is important that you spell the names correctly and with correct capitalization.", br(),
                              "For example, entering Leonardo Dicaprio will not work; you must enter it as 'Leonardo DiCaprio'.", br(), 
@@ -44,24 +45,20 @@ ui <- fluidPage(titlePanel("Let's Make a Movie!"),
                                           ),
                            fluidRow(
                              column(3,
-                                    selectInput("genre.1", "Genre 1:", c("NULL", "Action", "Adventure", "Animation", "Comedy", "Crime", "Drama", "Family", "Fantasy",
+                                    selectInput("genre.1", "Genre 1:", c("Action", "Adventure", "Animation", "Comedy", "Crime", "Drama", "Family", "Fantasy",
                                                                          "History", "Horror", "Music", "Mystery", "Romance", "Science Fiction", "Thriller", "War", "Western")),
                                     selectInput("genre.2", "Genre 2:", c("NULL", "Action", "Adventure", "Animation", "Comedy", "Crime", "Drama", "Family", "Fantasy",
                                                                          "History", "Horror", "Music", "Mystery", "Romance", "Science Fiction", "Thriller", "War", "Western")),
                                     selectInput("genre.3", "Genre 3:", c("NULL", "Action", "Adventure", "Animation", "Comedy", "Crime", "Drama", "Family", "Fantasy",
                                                                          "History", "Horror", "Music", "Mystery", "Romance", "Science Fiction", "Thriller", "War", "Western")),
-<<<<<<< HEAD
                                     submitButton("SUBMIT"), br(),
-                                    "Note: it will take a while to run"
-=======
-                                    submitButton("SUBMIT")
->>>>>>> 795f249c4ba0f11359a0e60fd455a38a5a9f24c1
+                                    "Note: it will take a while to run (30-45 s :( ). You may also see some errors such as 'New levels detected'. Working on that..."
                                     ),
                            ),
                              tabsetPanel(
                                tabPanel("Summary",
                                         "Your movie will make this much money", br(),
-                                        textOutput("moneyprediction"), br(),
+                                        withSpinner(textOutput("moneyprediction"), size = 0.5), br(),
                                         "Your movie will earn a rating of", br(),
                                         textOutput("ratingprediction"), br(),
                                         "Your data", br(),
@@ -81,7 +78,7 @@ ui <- fluidPage(titlePanel("Let's Make a Movie!"),
                                )
                              )
                            ),
-                  tabPanel("Acknowledgements", fluid = TRUE)
+                  tabPanel("Future Updates", fluid = TRUE)
                   )
 )
 server <- function(input, output) {
