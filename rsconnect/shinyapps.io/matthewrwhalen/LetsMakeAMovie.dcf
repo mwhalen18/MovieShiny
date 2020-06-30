@@ -1,0 +1,13 @@
+name: LetsMakeAMovie
+title: LetsMakeAMovie
+username:
+account: matthewrwhalen
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2439660
+bundleId: 3334799
+url: https://matthewrwhalen.shinyapps.io/LetsMakeAMovie/
+when: 1593533130.22426
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: final.movie.data.csv|README.md|TMDb.Scraping.R
