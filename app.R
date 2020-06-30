@@ -5,16 +5,35 @@ library(tidyverse)
 library(lme4)
 library(shinycssloaders)
 #str(bcl)
-TMDb6000 <- read.csv("TMDb.6000.csv")
+TMDb6000 <- read.csv("TMDb.6000.csv") %>% mutate(Action = as.factor(Action),
+                                                 Adventure = as.factor(Adventure),
+                                                 Animation = as.factor(Animation),
+                                                 Comedy = as.factor(Comedy),
+                                                 Drama = as.factor(Drama),
+                                                 Family = as.factor(Family),
+                                                 Fantasy = as.factor(Fantasy),
+                                                 History = as.factor(History),
+                                                 Horror = as.factor(Horror),
+                                                 Music = as.factor(Music),
+                                                 Mystery = as.factor(Mystery),
+                                                 Romance = as.factor(Romance),
+                                                 Thriller = as.factor(Thriller),
+                                                 War = as.factor(War),
+                                                 Western = as.factor(Western),
+                                                 Science.Fiction = as.factor(Science.Fiction))
 moneymodel <- 
-  lmer(revenue ~ 1 + genre.1 + genre.2 + genre.3 +
+  lmer(sqrt(revenue) ~ 1 + Action + Adventure + Animation + Comedy + Drama +
+         Family + Fantasy + History + Horror + Music + Mystery + Romance +
+         Thriller + War + Western + Science.Fiction +
          (1|Director) + (1|actor.1) + (1|actor.2) + (1|actor.3), 
-       data = TMDb6000, na.action = na.omit)
+       data = TMDb6000)
 
 ratingsmodel <-
-  lmer(vote_average ~ 1 + genre.1 + genre.2 + genre.3 +
-         (1|Director) + (1|actor.1) + (1|actor.2) + (1|actor.3), 
-       data = TMDb6000, na.action = na.omit)
+  lmer(vote_average ~ 1 + Action + Adventure + Animation + Comedy + Drama +
+        Family + Fantasy + History + Horror + Music + Mystery + Romance +
+        Thriller + War + Western + Science.Fiction +
+        (1|Director) + (1|actor.1) + (1|actor.2) + (1|actor.3), 
+      data = TMDb6000, na.action = na.omit)
 
 ui <- fluidPage(titlePanel("Let's Make a Movie!"),
                 tabsetPanel(
@@ -52,7 +71,7 @@ ui <- fluidPage(titlePanel("Let's Make a Movie!"),
                                     selectInput("genre.3", "Genre 3:", c("NULL", "Action", "Adventure", "Animation", "Comedy", "Crime", "Drama", "Family", "Fantasy",
                                                                          "History", "Horror", "Music", "Mystery", "Romance", "Science Fiction", "Thriller", "War", "Western")),
                                     submitButton("SUBMIT"), br(),
-                                    "Note: it will take a while to run (30-45 s :( ). You may also see some errors such as 'New levels detected'. Working on that..."
+                                    "Note: it will take a while to run (10-15 s). You may also see some errors such as 'New levels detected'. Working on that..."
                                     ),
                            ),
                              tabsetPanel(
@@ -87,9 +106,57 @@ server <- function(input, output) {
     actor.1 = as.factor(input$actor.1),
     actor.2 = as.factor(input$actor.2),
     actor.3 = as.factor(input$actor.3),
-    genre.1 = as.factor(input$genre.1),
-    genre.2 = as.factor(input$genre.2),
-    genre.3 = as.factor(input$genre.3)
+    Action = as.factor(ifelse(input$genre.1 == "Action", 1,
+                    ifelse(input$genre.2 == "Action", 1,
+                           ifelse(input$genre.3 == "Action", 1, 0)))),
+    Adventure = as.factor(ifelse(input$genre.1 == "Adventure", 1,
+                       ifelse(input$genre.2 == "Adventure", 1,
+                              ifelse(input$genre.3 == "Adventure", 1, 0)))),
+    Animation = as.factor(ifelse(input$genre.1 == "Animation", 1,
+                       ifelse(input$genre.2 == "Animation", 1,
+                              ifelse(input$genre.3 == "Animation", 1, 0)))),
+    Comedy = as.factor(ifelse(input$genre.1 == "Comedy", 1,
+                    ifelse(input$genre.2 == "Comedy", 1,
+                           ifelse(input$genre.3 == "Comedy", 1, 0)))),
+    Crime = as.factor(ifelse(input$genre.1 == "Crime", 1,
+                   ifelse(input$genre.2 == "Crime", 1,
+                          ifelse(input$genre.3 == "Crime", 1, 0)))),
+    Drama = as.factor(ifelse(input$genre.1 == "Drama", 1,
+                   ifelse(input$genre.2 == "Drama", 1,
+                          ifelse(input$genre.3 == "Drama", 1, 0)))),
+    Family = as.factor(ifelse(input$genre.1 == "Family", 1,
+                    ifelse(input$genre.2 == "Family", 1,
+                           ifelse(input$genre.3 == "Family", 1, 0)))),
+    Fantasy = as.factor(ifelse(input$genre.1 == "Fantasy", 1,
+                     ifelse(input$genre.2 == "Fantasy", 1,
+                            ifelse(input$genre.3 == "Fantasy", 1, 0)))),
+    History = as.factor(ifelse(input$genre.1 == "History", 1,
+                     ifelse(input$genre.2 == "History", 1,
+                            ifelse(input$genre.3 == "History", 1, 0)))),
+    Horror = as.factor(ifelse(input$genre.1 == "Horror", 1,
+                    ifelse(input$genre.2 == "Horror", 1,
+                           ifelse(input$genre.3 == "Horror", 1, 0)))),
+    Music = as.factor(ifelse(input$genre.1 == "Music", 1,
+                   ifelse(input$genre.2 == "Music", 1,
+                          ifelse(input$genre.3 == "Music", 1, 0)))),
+    Mystery = as.factor(ifelse(input$genre.1 == "Mystery", 1,
+                     ifelse(input$genre.2 == "Mystery", 1,
+                            ifelse(input$genre.3 == "Mystery", 1, 0)))),
+    Romance = as.factor(ifelse(input$genre.1 == "Romance", 1,
+                     ifelse(input$genre.2 == "Romance", 1,
+                            ifelse(input$genre.3 == "Romance", 1, 0)))),
+    Science.Fiction = as.factor(ifelse(input$genre.1 == "Science Fiction", 1,
+                             ifelse(input$genre.2 == "Science Fiction", 1,
+                                    ifelse(input$genre.3 == "Science Fiction", 1, 0)))),
+    Thriller = as.factor(ifelse(input$genre.1 == "Thriller", 1,
+                      ifelse(input$genre.2 == "Thriller", 1,
+                             ifelse(input$genre.3 == "Thriller", 1, 0)))),
+    War = as.factor(ifelse(input$genre.1 == "War", 1,
+                 ifelse(input$genre.2 == "War", 1,
+                        ifelse(input$genre.3 == "War", 1, 0)))),
+    Western = as.factor(ifelse(input$genre.1 == "Western", 1,
+                     ifelse(input$genre.2 == "Western", 1,
+                            ifelse(input$genre.3 == "Western", 1, 0))))
     )
   })
   output$user.data <- renderTable({
@@ -97,7 +164,7 @@ server <- function(input, output) {
   })
 
     output$moneyprediction <- renderText(
-      predict(moneymodel,newdata(),allow.new.levels = FALSE)
+      (predict(moneymodel,newdata(),allow.new.levels = FALSE))^2
   )
   
   output$ratingprediction <- renderText(
