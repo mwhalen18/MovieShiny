@@ -7,6 +7,9 @@ library(parallel)
 library(lubridate)
 library(lme4)
 detectCores()
+options(scipen = 999)
+
+select <- dplyr::select
 
 ####################fetching movie data from APIS #########
 #this is a clunky way of just generating a ton of movie ids
@@ -1705,7 +1708,7 @@ write.csv(flwa30, "full.movie.scrape.data.csv")
 
 ##########Read in full scraped data set##############################
 
-setwd("~/Box Sync/Data Sets")
+setwd("~/Box Sync/Data Sets/Movie Data Sets")
 move <- read.csv("full.movie.scrape.data.csv")
 
 
@@ -1842,21 +1845,14 @@ TMDb6001 <- movies.scraped.and.bound
 View(TMDb6001)
 
 #I want to clean this more to make it fit with the other format
-TMDb6000 <- TMDb6001 %>% rename(ProdCompany.1 = production_companies.name1,
-                                actor.1 = actor1,
-                                actor.2 = actor2,
-                                actor.3 = actor3,
-                                actor.4 = actor4,
-                                actor.5 = actor5) %>%
-  mutate(logrevenue = log(revenue + 1),
-         genre.1 = ifelse(is.na(genre.1), "NULL", genre.1),
+TMDb6000 <- TMDb6001 %>% 
+  mutate(genre.1 = ifelse(is.na(genre.1), "NULL", genre.1),
          genre.2 = ifelse(is.na(genre.2), "NULL", genre.2),
          genre.3 = ifelse(is.na(genre.3), "NULL", genre.3),
-         actor.1 = ifelse(is.na(actor.1), "NULL", actor.1),
-         actor.2 = ifelse(is.na(actor.2), "NULL", actor.2),
-         actor.3 = ifelse(is.na(actor.3), "NULL", actor.3)) %>%
-  mutate(revenue = as.integer(revenue),
-         Director = as.factor(Director),
+         actor.1 = ifelse(is.na(actor1), "NULL", actor1),
+         actor.2 = ifelse(is.na(actor2), "NULL", actor2),
+         actor.3 = ifelse(is.na(actor3), "NULL", actor3)) %>%
+  mutate(Director = as.factor(Director),
          actor.1 = as.factor(actor.1),
          actor2 = as.factor(actor.2),
          actor.3 = as.factor(actor.3),
@@ -1866,15 +1862,110 @@ TMDb6000 <- TMDb6001 %>% rename(ProdCompany.1 = production_companies.name1,
                                                   genre.1 != "TV Movie",
                                                   genre.3 != "TV Movie",
                                                   genre.1 != "Documentary",
-                                                  runtime > 70,
-                                                  !is.na(logrevenue)) %>%
-  select(revenue, logrevenue, vote_average, genre.1, genre.2, genre.3, Director, actor.1, actor.2, actor.3) %>% group_by(Director) %>% mutate(count = n()) %>% filter(count > 2) %>% ungroup() %>% select(-count)
+                                                  runtime > 70) %>%
+  select(revenue, vote_average, genre.1, genre.2, genre.3, Director, actor.1, actor.2, actor.3) %>% group_by(Director) %>% mutate(count = n()) %>% filter(count > 2) %>% ungroup() %>% select(-count) %>%
+  mutate(Action = as.factor(ifelse(genre.1 == "Action", 1,
+                         ifelse(genre.2 == "Action", 1,
+                                ifelse(genre.3 == "Action", 1, 0)))),
+         Adventure = as.factor(ifelse(genre.1 == "Adventure", 1,
+                         ifelse(genre.2 == "Adventure", 1,
+                                ifelse(genre.3 == "Adventure", 1, 0)))),
+         Animation = as.factor(ifelse(genre.1 == "Animation", 1,
+                         ifelse(genre.2 == "Animation", 1,
+                                ifelse(genre.3 == "Animation", 1, 0)))),
+         Comedy = as.factor(ifelse(genre.1 == "Comedy", 1,
+                         ifelse(genre.2 == "Comedy", 1,
+                                ifelse(genre.3 == "Comedy", 1, 0)))),
+         Crime = as.factor(ifelse(genre.1 == "Crime", 1,
+                         ifelse(genre.2 == "Crime", 1,
+                                ifelse(genre.3 == "Crime", 1, 0)))),
+         Drama = as.factor(ifelse(genre.1 == "Drama", 1,
+                         ifelse(genre.2 == "Drama", 1,
+                                ifelse(genre.3 == "Drama", 1, 0)))),
+         Family = as.factor(ifelse(genre.1 == "Family", 1,
+                         ifelse(genre.2 == "Family", 1,
+                                ifelse(genre.3 == "Family", 1, 0)))),
+         Fantasy = as.factor(ifelse(genre.1 == "Fantasy", 1,
+                         ifelse(genre.2 == "Fantasy", 1,
+                                ifelse(genre.3 == "Fantasy", 1, 0)))),
+         History = as.factor(ifelse(genre.1 == "History", 1,
+                         ifelse(genre.2 == "History", 1,
+                                ifelse(genre.3 == "History", 1, 0)))),
+         Horror = as.factor(ifelse(genre.1 == "Horror", 1,
+                         ifelse(genre.2 == "Horror", 1,
+                                ifelse(genre.3 == "Horror", 1, 0)))),
+         Music = as.factor(ifelse(genre.1 == "Music", 1,
+                         ifelse(genre.2 == "Music", 1,
+                                ifelse(genre.3 == "Music", 1, 0)))),
+         Mystery = as.factor(ifelse(genre.1 == "Mystery", 1,
+                         ifelse(genre.2 == "Myster", 1,
+                                ifelse(genre.3 == "Mystery", 1, 0)))),
+         Romance = as.factor(ifelse(genre.1 == "Romance", 1,
+                         ifelse(genre.2 == "Romance", 1,
+                                ifelse(genre.3 == "Romance", 1, 0)))),
+         Science.Fiction = as.factor(ifelse(genre.1 == "Science Fiction", 1,
+                         ifelse(genre.2 == "Science Fiction", 1,
+                                ifelse(genre.3 == "Science Fiction", 1, 0)))),
+         Thriller = as.factor(ifelse(genre.1 == "Thriller", 1,
+                         ifelse(genre.2 == "Thriller", 1,
+                                ifelse(genre.3 == "Thriller", 1, 0)))),
+         War = as.factor(ifelse(genre.1 == "War", 1,
+                         ifelse(genre.2 == "War", 1,
+                                ifelse(genre.3 == "War", 1, 0)))),
+         Western = as.factor(ifelse(genre.1 == "Western", 1,
+                         ifelse(genre.2 == "Western", 1,
+                                ifelse(genre.3 == "Western", 1, 0))))) %>% filter(revenue > 1)
 
 
 setwd("~/Box Sync/R Codes/MovieShiny")
 write.csv(TMDb6000, "TMDb.6000.csv") #In Todd voice from Bojack: "Hooray!"
 
+moneymodel <- 
+  lmer(log10(revenue+1) ~ 1 + Action + Adventure + Animation + Comedy + Drama +
+         Family + Fantasy + History + Horror + Music + Mystery + Romance +
+         Thriller + War + Western + Science.Fiction +
+         (1|Director) + (1|actor.1) + (1|actor.2) + (1|actor.3), 
+       data = TMDb6000)
 
+newdata <- data.frame(Distributor = "Paramount Pictures",
+                      Director = "Christopher Nolan",
+                      actor.1 = "Leonardo DiCaprio",
+                      actor.2 = "Michael Caine",
+                      actor.3 = "Heath Ledger",
+                      Action = 1,
+                      Adventure = 0,
+                      Animation = 0,
+                      Comedy = 0,
+                      Crime = 1,
+                      Drama = 1,
+                      Family = 0,
+                      Fantasy = 0,
+                      History = 0,
+                      Horror = 0,
+                      Music = 0,
+                      Mystery = 0,
+                      Romance = 0,
+                      Science.Fiction = 0,
+                      Thriller = 0,
+                      War = 0,
+                      Western = 0,
+                      year = 2019)
 
+plot(moneymodel)
+qqnorm(resid(moneymodel))
+hist(resid(moneymodel))
+hist(TMDb6000$revenue)
+10^(predict(moneymodel, newdata))
+
+votemodel <- 
+  lmer(vote_average ~ 1 + Action + Adventure + Animation + Comedy + Drama +
+         Family + Fantasy + History + Horror + Music + Mystery + Romance +
+         Thriller + War + Western + Science.Fiction +
+         (1|Director) + (1|actor.1) + (1|actor.2) + (1|actor.3), 
+       data = TMDb6000, na.action = na.omit)
+plot(votemodel)
+qqnorm(resid(votemodel))
+hist(resid(votemodel))
+(predict(votemodel, newdata))
 
 
