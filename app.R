@@ -44,8 +44,7 @@ ui <- fluidPage(titlePanel("Let's Make a Movie!"),
                   tabPanel("About", br(), fluid = TRUE,
                            mainPanel(
                              strong("The Data"), br(),
-                             "Data were collected by scraping data from various wikipedia pages. Some data was supplemented by scraping from Box Office Mojo", br(), 
-                             "A new data set is being generated using APIs from the TMDb database. Check back for updates", br(), br(), "Code is available on the my GitHub page (https://github.com/mwhalen18/MovieShiny)", br(), br(),
+                             "Data were collected using APIs from the TMDb database. The full dataset includes each film, full cast and crew, genre descriptions, as well as average user ratings from the TMDb website.", br(), br(), "Code is available on the my GitHub page (https://github.com/mwhalen18/MovieShiny)", br(), br(),
                              strong("The Model"), br(),
                              "Model Desicriptions coming. Check back for updates.", br(), br(),
                              strong("HOW TO USE THE APP"), br(),
@@ -53,8 +52,14 @@ ui <- fluidPage(titlePanel("Let's Make a Movie!"),
                              "For example, entering Leonardo Dicaprio will not work; you must enter it as 'Leonardo DiCaprio'.", br(), 
                              "In addition, many names require special characters. For example, 'Chloe Grace Moretz' will not work; you must enter 'Chloë Grace Moretz'.", br(),
                              "You will find a list of the names of all actors and directors as they appear in the data set.", br(), br(),
-                             "Select a '1' for each genre you wish to assign to your movie. Be sure to enter a '0' for any genres you do not wish to include. (This is a weird thing that I could easily fix but I don't feel like it)", br(),
-                             "Update: this has been fixed. There is now a drop down menu to select your genres. Trade-off: you only get 3 genres. You still need to specify 'Null' if you wish to exclude a genres. Again, an update will fix this later.", br()
+                             "There is now a drop down menu to select your genres. Trade-off: you only get 3 genres. You need to specify 'Null' if you wish to exclude a genres. Again, an update will fix this later.", br(), br(),
+                             strong("A FEW CAVEATS"), br(),
+                             "One big hiccup in the model and soething that will likely pose a big challenge in the future, is the lack of revenue data for streaming service movies. Netflix in particular keeps streaming data extremely tightly controlled so anyone working on modelling revenue will not be able to include netflix titles in their data. 
+                             In particular, since Netflix releases some of their movies to theaters for limited release, we have very bad predictions for how much money they make. We could predict revenue from number of streams a movie gets but this data is also kept secret by Netflix. So it goes...", br(), br(),
+                             "The ratings data is also pretty spotty. These are not critical reviews, but aggregate scores from TMDb, as voted on by users. It would be possible to pull metacritic data, but there is a bigger issue.
+                             RATINGS SYSTEMS STINK. I've posted some graphs on my blog showing just how little variation there is in how movies are reviewed. Early on in Holywood everything was on a 4 or 5 star scale, resulting in very very little variation as most movies got a 75-100% rating.
+                             With the introduction of the 10 star scale, there wasn't much change. People tend to feel bad giving a movie a half star rating...sad.", br(),
+                             "But, obviously this is all for fun so who cares"
                            )),
                   tabPanel("Make Your Movie", fluid = TRUE,
                            sidebarPanel(textInput("Director", "Director Name", value = ""),
@@ -71,7 +76,7 @@ ui <- fluidPage(titlePanel("Let's Make a Movie!"),
                                     selectInput("genre.3", "Genre 3:", c("NULL", "Action", "Adventure", "Animation", "Comedy", "Crime", "Drama", "Family", "Fantasy",
                                                                          "History", "Horror", "Music", "Mystery", "Romance", "Science Fiction", "Thriller", "War", "Western")),
                                     submitButton("SUBMIT"), br(),
-                                    "Note: it will take a while to run (10-15 s). You may also see some errors such as 'New levels detected'. Working on that..."
+                                    "Note: it will take a second to run. I am working on a better 'loading' visualization."
                                     ),
                            ),
                              tabsetPanel(
@@ -79,9 +84,7 @@ ui <- fluidPage(titlePanel("Let's Make a Movie!"),
                                         "Your movie will make this much money", br(),
                                         withSpinner(textOutput("moneyprediction"), size = 0.5), br(),
                                         "Your movie will earn a rating of", br(),
-                                        textOutput("ratingprediction"), br(),
-                                        "Your data", br(),
-                                        tableOutput("user.data"), br(), br()
+                                        textOutput("ratingprediction"), br()
                                ),
                                tabPanel("List of Directors", br(),
                                         strong("List of Directors in alphabetical order. You may copy and poste the name to ensure accurate spelling."), br(),
@@ -159,10 +162,7 @@ server <- function(input, output) {
                             ifelse(input$genre.3 == "Western", 1, 0))))
     )
   })
-  output$user.data <- renderTable({
-    newdata()
-  })
-
+  
     output$moneyprediction <- renderText(
       (predict(moneymodel,newdata(),allow.new.levels = FALSE))^2
   )
