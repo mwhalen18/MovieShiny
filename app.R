@@ -4,6 +4,7 @@ library(shiny)
 library(tidyverse)
 library(lme4)
 library(shinycssloaders)
+library(shinythemes)
 #str(bcl)
 TMDb6000 <- read.csv("TMDb.6000.csv") %>% mutate(Action = as.factor(Action),
                                                  Adventure = as.factor(Adventure),
@@ -35,7 +36,8 @@ ratingsmodel <-
         (1|Director) + (1|actor.1) + (1|actor.2) + (1|actor.3), 
       data = TMDb6000, na.action = na.omit)
 
-ui <- fluidPage(titlePanel("Let's Make a Movie!"),
+ui <- fluidPage(theme = shinytheme("flatly"),
+                titlePanel("Let's Make a Movie!"),
                 tabsetPanel(
                   tabPanel("Welcome", br(), fluid = TRUE,
                            mainPanel(
@@ -45,8 +47,6 @@ ui <- fluidPage(titlePanel("Let's Make a Movie!"),
                            mainPanel(
                              strong("The Data"), br(),
                              "Data were collected using APIs from the TMDb database. The full dataset includes each film, full cast and crew, genre descriptions, as well as average user ratings from the TMDb website.", br(), br(), "Code is available on the my GitHub page (https://github.com/mwhalen18/MovieShiny)", br(), br(),
-                             strong("The Model"), br(),
-                             "Model Desicriptions coming. Check back for updates.", br(), br(),
                              strong("HOW TO USE THE APP"), br(),
                              "In order for your entries to work in the model, it is important that you spell the names correctly and with correct capitalization.", br(),
                              "For example, entering Leonardo Dicaprio will not work; you must enter it as 'Leonardo DiCaprio'.", br(), 
@@ -100,6 +100,8 @@ ui <- fluidPage(titlePanel("Let's Make a Movie!"),
                                )
                              )
                            ),
+                  tabPanel("Model Descriptions and Performance", br(),
+                           "Check back at some point in the very distant future"),
                   tabPanel("Future Updates", fluid = TRUE)
                   )
 )
