@@ -4,6 +4,7 @@ library(shiny)
 library(tidyverse)
 library(lme4)
 library(shinycssloaders)
+library(shinythemes)
 #str(bcl)
 TMDb6000 <- read.csv("TMDb.6000.csv") %>% mutate(Action = as.factor(Action),
                                                  Adventure = as.factor(Adventure),
@@ -35,7 +36,8 @@ ratingsmodel <-
         (1|Director) + (1|actor.1) + (1|actor.2) + (1|actor.3), 
       data = TMDb6000, na.action = na.omit)
 
-ui <- fluidPage(titlePanel("Let's Make a Movie!"),
+ui <- fluidPage(theme = shinytheme("flatly"),
+                titlePanel("Let's Make a Movie!"),
                 tabsetPanel(
                   tabPanel("Welcome", br(), fluid = TRUE,
                            mainPanel(
