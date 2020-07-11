@@ -36,7 +36,7 @@ ratingsmodel <-
         (1|Director) + (1|actor.1) + (1|actor.2) + (1|actor.3), 
       data = TMDb6000, na.action = na.omit)
 
-ui <- fluidPage(theme = shinytheme("flatly"),
+ui <- fluidPage(theme = shinytheme("spacelab"),
                 titlePanel("Let's Make a Movie!"),
                 tabsetPanel(
                   tabPanel("Welcome", br(), fluid = TRUE,
@@ -101,8 +101,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                              )
                            ),
                   tabPanel("Model Descriptions and Performance", br(),
-                           "Check back at some point in the very distant future"),
-                  tabPanel("Future Updates", fluid = TRUE)
+                           "Check back at some point in the very distant future")
                   )
 )
 server <- function(input, output) {
