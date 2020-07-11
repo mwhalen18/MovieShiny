@@ -101,7 +101,7 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                              )
                            ),
                   tabPanel("Model Descriptions and Performance", br(),
-                           "Check back at some point in the very distant future")
+                           "Check back at some point in the very distant future ")
                   )
 )
 server <- function(input, output) {
