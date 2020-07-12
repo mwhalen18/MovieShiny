@@ -5,6 +5,8 @@ library(tidyverse)
 library(lme4)
 library(shinycssloaders)
 library(shinythemes)
+
+set.seed(7106)
 #str(bcl)
 TMDb6000 <- read.csv("TMDb.6000.csv") %>% mutate(Action = as.factor(Action),
                                                  Adventure = as.factor(Adventure),
@@ -94,10 +96,14 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                                         strong("List of Lead actors in alphabetical order. You may copy and poste the name to ensure accurate spelling."), br(),
                                         tableOutput("actor1list")
                                ),
-                               tabPanel("List of Supporting Actors", br(),
-                                        strong("List of Lead actors in alphabetical order. You may copy and poste the name to ensure accurate spelling."), br(),
+                               tabPanel("List of Primary Supporting Actors", br(),
+                                        strong("List of supporting actors in alphabetical order. You may copy and poste the name to ensure accurate spelling."), br(),
                                         tableOutput("suppactorlist")
-                               )
+                               ),
+                               tabPanel("List of Secondary Supporting Actors", br(),
+                                        strong("List of supporting actors in alphabetical order. You may copy and paste the name to ensure accurate spelling."),
+                                        tableOutput("actor3list")
+                                        )
                              )
                            ),
                   tabPanel("Model Descriptions and Performance", br(),
@@ -180,6 +186,9 @@ server <- function(input, output) {
    )
    output$suppactorlist <- renderTable(
      TMDb6000 %>% select(actor.2) %>% unique() %>% arrange(actor.2)
+   )
+   output$actor3list <- renderTable(
+     TMDb6000 %>% select(actor.3) %>% unique() %>% arrange(actor.3)
    )
 }
   

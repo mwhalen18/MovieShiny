@@ -5,9 +5,9 @@ account: matthewrwhalen
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 2439660
-bundleId: 3334799
+bundleId: 3381131
 url: https://matthewrwhalen.shinyapps.io/LetsMakeAMovie/
-when: 1593533130.22426
+when: 1594512764.2483
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: final.movie.data.csv|README.md|TMDb.Scraping.R
+ignoredFiles: Model Testing.R|README.md|TMDb.Scraping.R
