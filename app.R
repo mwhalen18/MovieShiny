@@ -7,6 +7,7 @@ library(shinycssloaders)
 library(shinythemes)
 
 set.seed(7106)
+
 #str(bcl)
 TMDb6000 <- read.csv("TMDb.6000.csv") %>% mutate(Action = as.factor(Action),
                                                  Adventure = as.factor(Adventure),
