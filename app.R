@@ -39,6 +39,19 @@ ratingsmodel <-
         (1|Director) + (1|actor.1) + (1|actor.2) + (1|actor.3), 
       data = TMDb6000, na.action = na.omit)
 
+preddata <- TMDb6000
+pred.revenue <- predict(moneymodel, preddata)
+pred.rating <- predict(ratingsmodel, preddata)
+
+poly <- cbind(TMDb6000, pred.revenue)
+polyy <- cbind(poly, pred.rating)
+
+predictions <- lm(sqrt(revenue) ~ pred.revenue, poly)
+predictions2 <- lm(vote_average ~ pred.rating, polyy)
+rev.R2 <- summary(predictions)$r.squared
+rate.R2 <- summary(predictions2)$r.squared
+
+
 ui <- fluidPage(theme = shinytheme("spacelab"),
                 titlePanel("Let's Make a Movie!"),
                 tabsetPanel(
@@ -108,7 +121,10 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                              )
                            ),
                   tabPanel("Model Descriptions and Performance", br(),
-                           "Check back at some point in the very distant future ")
+                           "Is is perfect...NO. Is it satisfactory for a Shiny app maybe a total of 5 people will see? Sure....", br(), br(),
+                           plotOutput("revenue.plot"), br(), br(), br(), br(),
+                           plotOutput("rating_plot")
+                           )
                   )
 )
 server <- function(input, output) {
@@ -178,7 +194,7 @@ server <- function(input, output) {
   output$ratingprediction <- renderText(
     predict(ratingsmodel,newdata(),allow.new.levels = FALSE)
   )
- 
+  
    output$directorlist <- renderTable(
      TMDb6000 %>% select(Director) %>% unique() %>% arrange(Director)
      )
@@ -190,6 +206,22 @@ server <- function(input, output) {
    )
    output$actor3list <- renderTable(
      TMDb6000 %>% select(actor.3) %>% unique() %>% arrange(actor.3)
+   )
+   output$revenue.plot <- renderPlot(
+     polyy %>% ggplot(aes(pred.revenue, sqrt(revenue))) + 
+       geom_point(alpha = 0.3) + 
+       geom_smooth(method = "lm", se = FALSE) + xlab("Model Predictions") + ylab("Actual Revenue") + ggtitle("Model Predictions vs Expected Revenue") +
+       annotate("text", x = 6000, y = 45000, label = rev.R2, size = 3.5) + 
+       annotate("text", x = 6000, y = 47500, label = "R^2 = ", size = 3.5) +
+       theme_classic()
+     )
+   output$rating_plot <- renderPlot(
+     polyy %>% ggplot(aes(pred.rating, vote_average)) + 
+       geom_point(alpha = 0.3) + 
+       geom_smooth(method = "lm", se = FALSE) + xlab("Model Predictions") + ylab("Actual Rating") + ggtitle("Model Predictions vs Expected Rating") +
+       annotate("text", x = 5, y = 7.5, label = rate.R2, size = 3.5) +
+       annotate("text", x = 5, y = 7.75, label = "R^2 = ", size = 3.5) +
+       theme_classic()
    )
 }
   
