@@ -16,6 +16,7 @@ predictions2 <- lm(vote_average ~ pred.rating, polyy)
 
 revenue.plot <- polyy %>% ggplot(aes(pred.revenue, sqrt(revenue))) + 
   geom_point(alpha = 0.3) + 
+<<<<<<< HEAD
   geom_smooth(method = "lm", se = FALSE) + xlab("Model Predictions") + ylab("Actual Revenue") + ggtitle("Model Predictions vs Expected Revenue") +
   annotate("text", x = 6000, y = 45000, label = rev.R2, size = 3) + 
   annotate("text", x = 6000, y = 47500, label = "R^2 = ", size = 3)
@@ -29,5 +30,15 @@ rating.plot <- polyy %>% ggplot(aes(pred.rating, vote_average)) +
   annotate("text", x = 5, y = 7.75, label = "R^2 = ", size = 3)
 
 rate.R2 <- summary(predictions2)$r.squared
+=======
+  geom_smooth(method = "lm", se = FALSE) + xlab("Model Predictions") + ylab("Actual Revenue")
+
+summary(predictions)$r.squared
+summary(predictions2)$r.squared
+
+rating.plot <- polyy %>% ggplot(aes(pred.rating, vote_average)) + 
+  geom_point(alpha = 0.3) + 
+  geom_smooth(method = "lm", se = FALSE) + xlab("Model Predictions") + ylab("Actual Revenue")
+>>>>>>> 73ef8196199fbe219f9be275fb20b5042b8e2273
 
 
